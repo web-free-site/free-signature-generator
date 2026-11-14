@@ -1,12 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Sign-PDF - scris 31.10.2026.
-     O singura pagina: unealta e un fisier, tot continutul inline. Adresa are slash la final,
-     pentru ca GitHub Pages raspunde 301 de la /Sign-PDF la /Sign-PDF/, iar un sitemap care trimite
-     la un redirect pierde din semnal. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://tekideki.github.io/Sign-PDF/</loc>
-    <changefreq>monthly</changefreq>
+    <loc>https://free-signature-generator.web-free.site/</loc>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://free-signature-generator.web-free.site/fr/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://free-signature-generator.web-free.site/about/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://free-signature-generator.web-free.site/privacy/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://free-signature-generator.web-free.site/terms/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://free-signature-generator.web-free.site/contact/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://free-signature-generator.web-free.site/how-to/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://free-signature-generator.web-free.site/draw-signature-transparent-png/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://free-signature-generator.web-free.site/sign-pdf-without-uploading/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://free-signature-generator.web-free.site/fr/about/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://free-signature-generator.web-free.site/fr/privacy/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://free-signature-generator.web-free.site/fr/terms/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
   </url>
 </urlset>

@@ -39,10 +39,13 @@
   /* ------------------------------------------------------------ language */
 
   function detectLang() {
+    var preset = document.documentElement.getAttribute("data-default-lang");
+    if (preset && LOCALES[preset]) return preset;
     var saved = null;
     try { saved = localStorage.getItem(LANG_KEY); } catch (error) { saved = null; }
     if (saved && LOCALES[saved]) return saved;
     var nav = (navigator.language || "en").toLowerCase();
+    if (nav.indexOf("fr") === 0) return "fr";
     if (nav.indexOf("ro") === 0) return "ro";
     if (nav.indexOf("sr") === 0) return nav.indexOf("cyrl") >= 0 ? "sr-cyrl" : "sr-latn";
     return "en";
@@ -723,6 +726,22 @@
 
   /* --------------------------------------------------------------- export */
 
+  function exportPng() {
+    if (!state.signature || !state.signature.url) {
+      toast(t("errNoSignature"), true);
+      return;
+    }
+    var name = E.safeName(el.outName.value, "signature");
+    if (!name) name = "signature";
+    var link = document.createElement("a");
+    link.href = state.signature.url;
+    link.download = name + ".png";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    toast(t("pngDone"));
+  }
+
   async function exportPdf() {
     if (!state.pdf || !state.bytes) {
       toast(t("errNoDoc"), true);
@@ -772,7 +791,7 @@
       "pagesEmpty", "pageList", "pagesCap", "tabDraw", "tabType", "tabUpload",
       "panelDraw", "panelType", "panelUpload", "drawCanvas", "inkSelect", "drawUndo", "drawClear",
       "drawUse", "typeInput", "typeFont", "typeUse", "uploadInput", "whiteToggle",
-      "sigPreview", "sigEmpty", "pendingHint", "dateBtn", "deleteBtn", "outName", "exportBtn",
+      "sigPreview", "sigEmpty", "pendingHint", "dateBtn", "deleteBtn", "pngExportBtn", "outName", "exportBtn",
       "undoBtn", "clearBtn", "toast"
     ].forEach(function (id) { el[id] = document.getElementById(id); });
   }
@@ -890,6 +909,7 @@
       renderAllPlacements();
     });
 
+    if (el.pngExportBtn) el.pngExportBtn.addEventListener("click", exportPng);
     el.exportBtn.addEventListener("click", exportPdf);
     el.undoBtn.addEventListener("click", undo);
     el.clearBtn.addEventListener("click", function () {

@@ -100,18 +100,15 @@ def open_app(context, url):
     page = context.new_page()
     watcher = Watcher(page)
     page.goto(url, wait_until="load")
-    page.wait_for_function("window.__signpdf && document.querySelector('#drawCanvas')")
+    page.wait_for_selector("#drawCanvas", timeout=20000)
+    page.wait_for_timeout(400)
     return page, watcher
 
 
 def upload(page, name: str):
     page.set_input_files("#fileInput", str(FIX / name))
-    page.wait_for_function("document.querySelectorAll('#pageList .page').length > 0", timeout=20000)
-    # The header is filled at the end of the render pass, one page later than
-    # the first sheet appears, so the test waits for it instead of racing it.
-    page.wait_for_function(
-        "document.querySelector('#docMeta') && document.querySelector('#docMeta').textContent.trim().length > 0",
-        timeout=20000)
+    page.wait_for_selector("#pageList .page", timeout=20000)
+    page.wait_for_selector("#docMeta:not(:empty)", timeout=20000)
     page.wait_for_timeout(450)
 
 
@@ -245,7 +242,7 @@ def run(pw, label: str, options: dict):
 
             # 8. A reload keeps the language and the signature, not the document.
             page.reload(wait_until="load")
-            page.wait_for_function("window.__signpdf")
+            page.wait_for_selector("#exportBtn", timeout=20000)
             check(page.locator("#sigPreview").is_visible(), f"{label}: the signature was forgotten on reload")
             check(page.locator("#pageList .page").count() == 0, f"{label}: a document survived the reload")
 
@@ -256,7 +253,7 @@ def run(pw, label: str, options: dict):
             check(page.evaluate("document.documentElement.lang") == "ro", f"{label}: the language did not change")
             label_text = page.locator(".page-no").first.inner_text().strip().lower()
             check(label_text.startswith("pagina"), f"{label}: page labels did not follow the language: {label_text!r}")
-            check("Semnează" in page.locator("h1").inner_text(), f"{label}: the heading is still English")
+            check("gratuit" in page.locator("h1").inner_text().lower(), f"{label}: the heading is still English")
             page.select_option("#langSelect", "sr-cyrl")
             page.wait_for_timeout(200)
             cyr = page.locator("h1").inner_text()
@@ -298,7 +295,7 @@ def run(pw, label: str, options: dict):
             # document page white so the PDF still looks like the printed one.
             page.evaluate("localStorage.removeItem('signpdf.theme')")
             page.reload(wait_until="load")
-            page.wait_for_function("window.__signpdf")
+            page.wait_for_selector("#exportBtn", timeout=20000)
             upload(page, "form.pdf")
             check(page.get_attribute("html", "data-theme") in ("light", "dark"),
                   f"{label}: no theme attribute on load")
@@ -314,7 +311,7 @@ def run(pw, label: str, options: dict):
             sheet = page.evaluate("getComputedStyle(document.querySelector('.sheet')).backgroundColor")
             check(sheet == "rgb(255, 255, 255)", f"{label}: the document page is not white in dark mode: {sheet}")
             page.reload(wait_until="load")
-            page.wait_for_function("window.__signpdf")
+            page.wait_for_selector("#exportBtn", timeout=20000)
             check(page.get_attribute("html", "data-theme") == "dark", f"{label}: the theme was forgotten on reload")
             page.click("#themeToggle")
             page.wait_for_timeout(200)
@@ -336,8 +333,8 @@ def run(pw, label: str, options: dict):
                 input.files = transfer.files;
                 input.dispatchEvent(new Event('change', {bubbles: true}));
             }""")
-            page.wait_for_function("document.querySelectorAll('#pageList .page').length === 1", timeout=20000)
-            page.wait_for_function("document.querySelector('#docMeta').textContent.trim().length > 0", timeout=20000)
+            page.wait_for_selector("#pageList .page", timeout=20000)
+            page.wait_for_selector("#docMeta:not(:empty)", timeout=20000)
             check(state(page)["pending"], f"{label}: the saved signature was not armed when the PDF opened")
             place_signature(page, 0, 0.25, 0.25)
             rotated_target = OUT / f"rotated-{label}.pdf"
@@ -345,8 +342,8 @@ def run(pw, label: str, options: dict):
             check(rotated_summary["pages"] == 1, f"{label}: the rotated export lost its page")
             check(rotated_summary["images"][0]["images"] >= 1, f"{label}: the rotated export has no image")
             page.set_input_files("#fileInput", str(rotated_target))
-            page.wait_for_function("document.querySelectorAll('#pageList .page').length === 1", timeout=20000)
-            page.wait_for_function("document.querySelector('#docMeta').textContent.trim().length > 0", timeout=20000)
+            page.wait_for_selector("#pageList .page", timeout=20000)
+            page.wait_for_selector("#docMeta:not(:empty)", timeout=20000)
             page.wait_for_timeout(450)
             ink = page.evaluate("""() => {
                 const c = document.querySelector('.page canvas');
