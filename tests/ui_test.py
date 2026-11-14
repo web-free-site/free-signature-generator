@@ -126,16 +126,21 @@ def box_of(page, selector: str):
 
 
 def draw_signature(page):
+    page.locator("#drawUse").scroll_into_view_if_needed()
     box = box_of(page, "#drawCanvas")
     check(box is not None, "the drawing pad has no box")
-    cx, cy = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
-    page.mouse.move(cx - 90, cy + 20)
+    w, h = box["width"], box["height"]
+    x0 = box["x"] + w * 0.12
+    y0 = box["y"] + h * 0.55
+    page.mouse.move(x0, y0)
     page.mouse.down()
-    for step in range(1, 26):
-        page.mouse.move(cx - 90 + step * 6, cy + 20 - (18 if step % 3 else -14))
+    for step in range(1, 22):
+        t = step / 21
+        page.mouse.move(box["x"] + w * (0.12 + 0.76 * t), box["y"] + h * (0.55 - 0.28 * t + 0.08 * (step % 2)))
     page.mouse.up()
+    page.locator("#drawUse").scroll_into_view_if_needed()
     page.click("#drawUse")
-    page.wait_for_timeout(150)
+    page.wait_for_timeout(200)
 
 
 def click_page(page, index: int, nx: float, ny: float):

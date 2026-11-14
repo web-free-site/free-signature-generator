@@ -35,6 +35,10 @@
   var drag = null;
   var toastTimer = 0;
   var resizeTimer = 0;
+  var padResizeTimer = 0;
+  var lastPageListWidth = 0;
+  var lastPadCssWidth = 0;
+  var lastPadCssHeight = 0;
 
   /* ------------------------------------------------------------ language */
 
@@ -255,9 +259,9 @@
     setBusy(false);
     renderButtons();
     toast("");
-    if (window.innerWidth < 980) {
+    if (window.innerWidth >= 980) {
       var first = el.pageList.querySelector(".page");
-      if (first) first.scrollIntoView({ block: "start", behavior: "smooth" });
+      if (first) first.scrollIntoView({ block: "start", behavior: "auto" });
     }
   }
 
@@ -266,6 +270,7 @@
     var token = ++state.renderToken;
     var shown = Math.min(state.pdf.numPages, MAX_PAGES);
     var width = Math.max(el.pageList.clientWidth || el.doc.clientWidth || 640, 260);
+    lastPageListWidth = width;
 
     el.pageList.innerHTML = "";
     el.pagesEmpty.hidden = true;
@@ -512,16 +517,30 @@
 
   function padContext() {
     var canvas = el.drawCanvas;
-    var width = canvas.clientWidth || 320;
-    var height = canvas.clientHeight || 170;
+    var width = Math.round(canvas.clientWidth || 320);
+    var height = Math.round(canvas.clientHeight || 170);
     var dpr = Math.min(window.devicePixelRatio || 1, 3);
-    if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
+    var targetW = Math.max(1, Math.round(width * dpr));
+    var targetH = Math.max(1, Math.round(height * dpr));
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
     }
+    lastPadCssWidth = width;
+    lastPadCssHeight = height;
     var context = canvas.getContext("2d");
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
     return { context: context, width: width, height: height, dpr: dpr };
+  }
+
+  function syncPadCanvasSize() {
+    if (!el.drawCanvas || el.panelDraw.hidden) return;
+    var width = Math.round(el.drawCanvas.clientWidth || 0);
+    var height = Math.round(el.drawCanvas.clientHeight || 0);
+    if (width < 2 || height < 2) return;
+    if (width === lastPadCssWidth && height === lastPadCssHeight) return;
+    padContext();
+    redrawPad();
   }
 
   function redrawPad() {
@@ -942,13 +961,19 @@
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(function () {
         if (!state.pdf) return;
+        var width = Math.max(el.pageList.clientWidth || el.doc.clientWidth || 0, 260);
+        if (Math.abs(width - lastPageListWidth) < 10) return;
         renderPages();
-        if (!el.panelDraw.hidden) {
-          padContext();
-          redrawPad();
-        }
-      }, 260);
+      }, 280);
     });
+
+    if (window.ResizeObserver && el.drawCanvas) {
+      var padObserver = new ResizeObserver(function () {
+        clearTimeout(padResizeTimer);
+        padResizeTimer = setTimeout(syncPadCanvasSize, 100);
+      });
+      padObserver.observe(el.drawCanvas);
+    }
   }
 
   function workerSetup() {

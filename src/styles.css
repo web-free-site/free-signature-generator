@@ -714,7 +714,7 @@ main {
 /* ------------------------------------------------------------ responsive */
 
 @media (max-width: 980px) {
-  .layout-ads { grid-template-columns: minmax(0, 1fr); }
+  .workspace.layout-ads { grid-template-columns: minmax(0, 1fr); }
   .ad-rail { display: none; }
   .workspace-main, .workspace { grid-template-columns: minmax(0, 1fr); }
   .panel { position: static; }
@@ -723,8 +723,12 @@ main {
 }
 
 @media (max-width: 560px) {
-  .ad-sticky-mobile { display: flex; }
-  body { padding-bottom: 58px; font-size: 16px; }
+  .ad-sticky-mobile { display: flex; z-index: 4; pointer-events: auto; }
+  body { padding-bottom: 72px; font-size: 16px; }
+  #panel .btn.primary.wide,
+  #panel .panel-body { scroll-margin-bottom: 80px; }
+  #panel .panel-body { padding-bottom: 8px; }
+  .actions, .notes { scroll-margin-bottom: 80px; }
   .brand-name { font-size: 17px; }
   .lang label { display: none; }
   .intro { padding-bottom: 22px; }
