@@ -489,6 +489,8 @@ def write_sitemap(dist: Path) -> None:
         ("/how-to/", "monthly", "0.8"),
         ("/draw-signature-transparent-png/", "monthly", "0.75"),
         ("/sign-pdf-without-uploading/", "monthly", "0.75"),
+        ("/how-to-create-a-signature-for-email/", "monthly", "0.75"),
+        ("/how-to-make-a-transparent-signature-for-documents/", "monthly", "0.75"),
         ("/fr/about/", "monthly", "0.65"),
         ("/fr/privacy/", "monthly", "0.55"),
         ("/fr/terms/", "monthly", "0.55"),
